@@ -44,6 +44,8 @@ const htmlToText = (html, preserveSpacing) => {
   return decoded.replace(/\s+/g, " ").trim();
 };
 
+const isStandaloneFlowArrow = (value) => /^[↓⇣↧]+$/u.test(value.trim());
+
 const classifyParagraph = (className, text) => {
   if (className === "p1") return "title";
   if (className === "p2") return "subtitle";
@@ -75,7 +77,7 @@ const parseGeneralNote = (html) => {
     const className = match[1];
     const preserveSpacing = className === "p8" || className === "p9";
     const text = htmlToText(match[2], preserveSpacing);
-    if (!text) continue;
+    if (!text || isStandaloneFlowArrow(text)) continue;
 
     const block = { kind: classifyParagraph(className, text), text };
     const previous = paragraphs.at(-1);

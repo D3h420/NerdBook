@@ -42,6 +42,7 @@ test("keeps source notes out of the published application", async () => {
   assert.match(app, /general: true, bettercap: true/);
   assert.doesNotMatch(app, /nav-label-spaced|>RUNBOOKS</);
   assert.equal((app.match(/Start \/ Index/gi) ?? []).length, 1);
+  assert.match(importer, /isStandaloneFlowArrow/);
   for (const chapterId of ["chapter-0", "chapter-5", "chapter-6", "chapter-7", "chapter-8"]) {
     assert.match(importer, new RegExp(`"${chapterId}"`));
   }
