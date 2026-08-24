@@ -137,6 +137,29 @@ const parseGeneralNote = (html) => {
   }
   if (current.blocks.length) chapters.push(current);
 
+  const removedChapterIds = new Set([
+    "chapter-5",
+    "chapter-6",
+    "chapter-7",
+    "chapter-8",
+  ]);
+  const removedTocEntries = new Set([
+    "Łączenie narzędzi",
+    "Pytanie → narzędzie",
+    "Oficjalne źródła",
+    "Historia wersji",
+  ]);
+  const publishedChapters = chapters
+    .filter((chapter) => !removedChapterIds.has(chapter.id))
+    .map((chapter, index) => ({
+      ...chapter,
+      number: String(index).padStart(2, "0"),
+      blocks: chapter.blocks.filter(
+        (block) => !(chapter.id === "intro" && block.kind === "detail" && removedTocEntries.has(block.text)),
+      ),
+    }));
+  const publishedBlocks = publishedChapters.flatMap((chapter) => chapter.blocks);
+
   return {
     id: "nerdbook-it-v01",
     title: "NerdBook IT v0.1",
@@ -146,12 +169,15 @@ const parseGeneralNote = (html) => {
     scope: ["Nmap", "Wireshark", "TShark", "Zeek", "Bettercap"],
     sourceFile: "NerdBook_IT_v0.1.docx",
     stats: {
-      words: 6820,
-      sourceParagraphs: 1456,
-      chapters: chapters.length,
-      codeBlocks: paragraphs.filter((block) => block.kind === "code").length,
+      words: publishedBlocks.reduce(
+        (total, block) => total + block.text.split(/\s+/).filter(Boolean).length,
+        0,
+      ),
+      sourceParagraphs: publishedBlocks.length,
+      chapters: publishedChapters.length,
+      codeBlocks: publishedBlocks.filter((block) => block.kind === "code").length,
     },
-    chapters,
+    chapters: publishedChapters,
   };
 };
 
@@ -322,7 +348,7 @@ const parseBettercap = (source) => {
   return {
     id: "bettercap-a5-lab-flows",
     title: "Bettercap — A5 Lab Flows",
-    kicker: "Runbook • 7 workflowów • 2 procedury CLEAN",
+    kicker: "Lab note • 7 workflowów • 2 procedury CLEAN",
     sourceFile: "Bettercap_A5_Lab_Flows.txt",
     labNotice:
       "Uruchamiaj wyłącznie we własnym, odizolowanym LAB-ie albo w sieci, dla której masz jednoznaczną zgodę. Przechwycony ruch i pliki PCAP traktuj jak dane wrażliwe.",
@@ -343,8 +369,8 @@ const data = {
   generatedAt: "2026-08-24",
   identity: {
     name: "NerdBook",
-    title: "Private Knowledge Vault",
-    description: "Prywatny notes techniczny: dokumentacja, runbooki i cheat sheety.",
+    title: "External Memory Buffer",
+    description: "Forgotten commands, questionable workflows and things that worked once. Probably important.",
   },
   general: parseGeneralNote(generalHtml),
   bettercap: parseBettercap(bettercapSource),

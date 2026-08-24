@@ -9,8 +9,9 @@ async function render() {
 test("renders the encrypted NerdBook gate", async () => {
   const html = await render();
   assert.match(html, /<html lang="pl"/i);
-  assert.match(html, /<title>NerdBook \/\/ Private Knowledge Vault<\/title>/i);
-  assert.match(html, /PRIVATE KNOWLEDGE VAULT/);
+  assert.match(html, /<title>NerdBook \/\/ External Memory Buffer<\/title>/i);
+  assert.match(html, /An external memory buffer for forgotten commands/i);
+  assert.doesNotMatch(html, /PRIVATE KNOWLEDGE VAULT|PRIVATE VAULT/i);
   assert.match(html, /Fraza dostępu/);
   assert.match(html, /type="password"/);
   assert.match(html, /AES-256-GCM/);
@@ -22,11 +23,13 @@ test("renders the encrypted NerdBook gate", async () => {
 });
 
 test("keeps source notes out of the published application", async () => {
-  const [packageJson, vault, page, layout] = await Promise.all([
+  const [packageJson, vault, page, layout, app, importer] = await Promise.all([
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../app/data/vault.json", import.meta.url), "utf8"),
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/NerdBookApp.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../scripts/prepare-vault.mjs", import.meta.url), "utf8"),
   ]);
 
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
@@ -35,6 +38,12 @@ test("keeps source notes out of the published application", async () => {
   assert.doesNotMatch(vault, /"schemaVersion"|"chapters"|"flows"/i);
   assert.match(page, /<NerdBookApp \/>/);
   assert.match(layout, /lang="pl"/);
+  assert.match(app, /aria-label="Drzewo notatek"/);
+  assert.match(app, /general: true, bettercap: true/);
+  assert.doesNotMatch(app, /nav-label-spaced|>RUNBOOKS</);
+  for (const chapterId of ["chapter-5", "chapter-6", "chapter-7", "chapter-8"]) {
+    assert.match(importer, new RegExp(`"${chapterId}"`));
+  }
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
   await assert.rejects(access(new URL("../work", import.meta.url).pathname + "/published"));
 });

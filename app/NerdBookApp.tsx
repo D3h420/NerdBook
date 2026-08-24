@@ -84,7 +84,7 @@ function TerminalGate({ onUnlock }: { onUnlock: (data: VaultData) => void }) {
             <span />
             <span />
           </div>
-          <p>nerdbook://vault/session-01</p>
+          <p>nerdbook://memory-buffer/session-01</p>
           <span className="terminal-signal">● encrypted</span>
         </header>
 
@@ -99,13 +99,15 @@ function TerminalGate({ onUnlock }: { onUnlock: (data: VaultData) => void }) {
           <div className="terminal-brand">
             <p className="terminal-overline">{"// PERSONAL KNOWLEDGE SYSTEM"}</p>
             <h1 id="gate-title">NERD<span>BOOK</span></h1>
-            <p className="terminal-subtitle">PRIVATE KNOWLEDGE VAULT</p>
+            <p className="terminal-subtitle">
+              An external memory buffer for forgotten commands, questionable workflows and things that worked once. Probably important.
+            </p>
           </div>
 
           <form className="unlock-form" onSubmit={submit} aria-busy={status === "unlocking"}>
             <label htmlFor="vault-password">Fraza dostępu</label>
             <div className="terminal-input-row">
-              <span className="prompt" aria-hidden="true">vault@nerdbook:~$</span>
+              <span className="prompt" aria-hidden="true">buffer@nerdbook:~$</span>
               <input
                 ref={inputRef}
                 id="vault-password"
@@ -130,7 +132,7 @@ function TerminalGate({ onUnlock }: { onUnlock: (data: VaultData) => void }) {
             <div className="unlock-actions">
               <p id="vault-help">AES-256-GCM // odszyfrowanie odbywa się lokalnie w tej karcie</p>
               <button className="unlock-button" type="submit" disabled={!password || status !== "locked"}>
-                {status === "unlocking" ? "DECRYPTING..." : status === "granted" ? "ACCESS GRANTED" : "UNLOCK VAULT →"}
+                {status === "unlocking" ? "DECRYPTING..." : status === "granted" ? "BUFFER MOUNTED" : "MOUNT NOTES →"}
               </button>
             </div>
             <p
@@ -139,7 +141,7 @@ function TerminalGate({ onUnlock }: { onUnlock: (data: VaultData) => void }) {
               role={error ? "alert" : "status"}
               aria-live="polite"
             >
-              {error || (status === "granted" ? "ACCESS GRANTED // montowanie notesu..." : "STATUS // VAULT LOCKED")}
+              {error || (status === "granted" ? "BUFFER MOUNTED // ładowanie notesu..." : "STATUS // MEMORY OFFLINE")}
             </p>
           </form>
         </div>
@@ -447,7 +449,7 @@ function BettercapOverview({
   return (
     <article className="bettercap-overview">
       <header className="collection-header">
-        <p className="breadcrumb">NerdBook <span>/</span> Runbooks</p>
+        <p className="breadcrumb">NerdBook <span>/</span> Bettercap</p>
         <p className="eyebrow">OPERATIONAL NOTE // A5 LAB</p>
         <h1>{data.title}</h1>
         <p>{data.kicker}</p>
@@ -500,24 +502,31 @@ function BettercapOverview({
 
 function Dashboard({ data, navigate }: { data: VaultData; navigate: (view: NotebookView) => void }) {
   const firstFlow = data.bettercap.flows[0];
-  const nmap = data.general.chapters.find((chapter) => chapter.id === "chapter-1");
+  const firstChapter = data.general.chapters[0];
+  const zeek = data.general.chapters.find((chapter) => chapter.id === "chapter-3");
+  const indexedItems = data.general.chapters.length + data.bettercap.flows.length + data.bettercap.cleanups.length;
 
   return (
     <article className="dashboard">
       <header className="dashboard-hero">
         <div>
-          <p className="eyebrow">VAULT MOUNTED // SESSION LOCAL</p>
+          <p className="eyebrow">MEMORY MAPPED // SESSION LOCAL</p>
           <h1>Twoja techniczna<br /><span>pamięć operacyjna.</span></h1>
           <p className="dashboard-lead">
-            Dokumentacja, runbooki i cheat sheety — zaszyfrowane w repozytorium, odszyfrowane wyłącznie w pamięci tej karty.
+            Zewnętrzny bufor pamięci dla zapomnianych komend, podejrzanych workflowów i rzeczy, które kiedyś zadziałały. Prawdopodobnie ważne.
           </p>
         </div>
-        <div className="vault-visual" aria-hidden="true">
-          <div className="vault-grid">
-            {Array.from({ length: 9 }, (_, index) => <span className={index === 4 ? "active" : ""} key={index} />)}
+        <div className="collection-summary" aria-label={`Kolekcja zawiera 2 notatki i ${indexedItems} pozycji w indeksie`}>
+          <p className="summary-label">COLLECTION // INDEXED</p>
+          <div className="summary-count">
+            <strong>02</strong>
+            <span>NOTATKI</span>
           </div>
-          <p>AES<br /><strong>256</strong></p>
-          <span>PAYLOAD / ONLINE</span>
+          <div className="summary-categories">
+            <div><span>01</span><strong>HANDBOOK</strong></div>
+            <div><span>01</span><strong>LAB FLOWS</strong></div>
+          </div>
+          <footer><span>{indexedItems.toString().padStart(2, "0")} pozycji</span><span>LOCAL DECRYPT</span></footer>
         </div>
       </header>
 
@@ -525,11 +534,11 @@ function Dashboard({ data, navigate }: { data: VaultData; navigate: (view: Noteb
 
       <section className="dashboard-section">
         <header className="section-heading-row">
-          <div><p className="section-kicker">COLLECTION / 02</p><h2>Notatki w sejfie</h2></div>
+          <div><p className="section-kicker">COLLECTION / 02</p><h2>Notatki w buforze</h2></div>
           <span>zaktualizowano {data.generatedAt}</span>
         </header>
         <div className="note-card-grid">
-          <button className="note-card note-card-handbook" type="button" onClick={() => navigate({ kind: "general", id: nmap?.id ?? "intro" })}>
+          <button className="note-card note-card-handbook" type="button" onClick={() => navigate({ kind: "general", id: firstChapter.id })}>
             <div className="note-card-top"><span>01 / HANDBOOK</span><span>v{data.general.version}</span></div>
             <h3>{data.general.title}</h3>
             <p>{data.general.kicker}</p>
@@ -537,7 +546,7 @@ function Dashboard({ data, navigate }: { data: VaultData; navigate: (view: Noteb
             <span className="note-card-cta">Otwórz podręcznik <b>→</b></span>
           </button>
           <button className="note-card note-card-runbook" type="button" onClick={() => navigate({ kind: "bettercap" })}>
-            <div className="note-card-top"><span>02 / RUNBOOK</span><span>LAB ONLY</span></div>
+            <div className="note-card-top"><span>02 / LAB NOTE</span><span>LAB ONLY</span></div>
             <h3>{data.bettercap.title}</h3>
             <p>Uporządkowane sekwencje, parametry, one-linery i procedury zatrzymania.</p>
             <div className="note-card-stats"><span>{data.bettercap.flows.length} workflowów</span><span>{data.bettercap.cleanups.length} cleanupy</span></div>
@@ -558,9 +567,11 @@ function Dashboard({ data, navigate }: { data: VaultData; navigate: (view: Noteb
           <button type="button" onClick={() => navigate({ kind: "general", id: "chapter-2" })}>
             <span>CHAPTER 02</span><strong>Wireshark i TShark</strong><small>Filtry, pakiety, analiza i praktyka.</small><b aria-hidden="true">↗</b>
           </button>
-          <button type="button" onClick={() => navigate({ kind: "general", id: "chapter-6" })}>
-            <span>DECISION MAP</span><strong>Pytanie → narzędzie</strong><small>Szybki wybór właściwego narzędzia do zadania.</small><b aria-hidden="true">↗</b>
-          </button>
+          {zeek ? (
+            <button type="button" onClick={() => navigate({ kind: "general", id: zeek.id })}>
+              <span>CHAPTER {zeek.number}</span><strong>{zeek.shortTitle}</strong><small>Logi, analiza ruchu i praca z danymi sieciowymi.</small><b aria-hidden="true">↗</b>
+            </button>
+          ) : null}
         </div>
       </section>
     </article>
@@ -616,6 +627,7 @@ function makeSearchHits(data: VaultData, rawQuery: string): SearchHit[] {
 function NotebookShell({ data }: { data: VaultData }) {
   const [view, setView] = useState<NotebookView>({ kind: "home" });
   const [menuOpen, setMenuOpen] = useState(false);
+  const [expandedNotes, setExpandedNotes] = useState({ general: true, bettercap: true });
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -624,6 +636,11 @@ function NotebookShell({ data }: { data: VaultData }) {
   const searchHits = useMemo(() => makeSearchHits(data, query), [data, query]);
 
   const navigate = (nextView: NotebookView) => {
+    if (nextView.kind === "general") {
+      setExpandedNotes((current) => ({ ...current, general: true }));
+    } else if (nextView.kind === "bettercap" || nextView.kind === "flow" || nextView.kind === "cleanup") {
+      setExpandedNotes((current) => ({ ...current, bettercap: true }));
+    }
     setView(nextView);
     setMenuOpen(false);
     setQuery("");
@@ -654,6 +671,8 @@ function NotebookShell({ data }: { data: VaultData }) {
 
   const active = (kind: NotebookView["kind"], id?: string) =>
     view.kind === kind && (!("id" in view) || view.id === id);
+  const generalBranchActive = view.kind === "general";
+  const bettercapBranchActive = view.kind === "bettercap" || view.kind === "flow" || view.kind === "cleanup";
 
   let content: ReactNode;
   if (view.kind === "general") {
@@ -752,20 +771,29 @@ function NotebookShell({ data }: { data: VaultData }) {
         <header className="sidebar-brand">
           <button type="button" onClick={() => navigate({ kind: "home" })} aria-label="NerdBook — strona główna">
             <span className="brand-mark">NB</span>
-            <div><strong>NERDBOOK</strong><small>PRIVATE VAULT // 01</small></div>
+            <div><strong>NERDBOOK</strong><small>EXTERNAL MEMORY // 02</small></div>
           </button>
           <button className="sidebar-close" type="button" onClick={() => setMenuOpen(false)} aria-label="Zamknij nawigację">×</button>
         </header>
 
-        <nav className="sidebar-nav">
-          <p className="nav-label">SYSTEM</p>
+        <nav className="sidebar-nav" aria-label="Drzewo notatek">
           <button className={`nav-root ${active("home") ? "is-active" : ""}`} type="button" onClick={() => navigate({ kind: "home" })}>
-            <span aria-hidden="true">⌂</span><span>Start / Index</span><small>02 notes</small>
+            <span aria-hidden="true">⌂</span><span>Start / Index</span><small>2 notatki</small>
           </button>
 
-          <section className="nav-collection">
-            <header><span aria-hidden="true">▦</span><div><strong>{data.general.title}</strong><small>HANDBOOK · {data.general.chapters.length} sekcji</small></div></header>
-            <div className="nav-children">
+          <section className="nav-collection tree-note">
+            <button
+              className={`collection-button tree-toggle ${generalBranchActive ? "is-active" : ""}`}
+              type="button"
+              onClick={() => setExpandedNotes((current) => ({ ...current, general: !current.general }))}
+              aria-expanded={expandedNotes.general}
+              aria-controls="general-note-tree"
+            >
+              <span className="tree-chevron" aria-hidden="true">›</span>
+              <div><strong>{data.general.title}</strong><small>NOTE 01 · {data.general.chapters.length} sekcji</small></div>
+              <span className="tree-order" aria-hidden="true">01</span>
+            </button>
+            <div id="general-note-tree" className={`nav-children tree-children ${expandedNotes.general ? "is-expanded" : ""}`}>
               {data.general.chapters.map((chapter) => (
                 <button
                   className={active("general", chapter.id) ? "is-active" : ""}
@@ -779,20 +807,30 @@ function NotebookShell({ data }: { data: VaultData }) {
             </div>
           </section>
 
-          <p className="nav-label nav-label-spaced">RUNBOOKS</p>
-          <section className="nav-collection nav-runbook">
-            <button className={`collection-button ${active("bettercap") ? "is-active" : ""}`} type="button" onClick={() => navigate({ kind: "bettercap" })}>
-              <span aria-hidden="true">⌁</span><div><strong>Bettercap</strong><small>A5 LAB FLOWS · {data.bettercap.flows.length}</small></div><span aria-hidden="true">→</span>
+          <section className="nav-collection tree-note">
+            <button
+              className={`collection-button tree-toggle ${bettercapBranchActive ? "is-active" : ""}`}
+              type="button"
+              onClick={() => setExpandedNotes((current) => ({ ...current, bettercap: !current.bettercap }))}
+              aria-expanded={expandedNotes.bettercap}
+              aria-controls="bettercap-note-tree"
+            >
+              <span className="tree-chevron" aria-hidden="true">›</span>
+              <div><strong>Bettercap</strong><small>NOTE 02 · {data.bettercap.flows.length + data.bettercap.cleanups.length + 1} sekcji</small></div>
+              <span className="tree-order" aria-hidden="true">02</span>
             </button>
-            <div className="nav-children">
+            <div id="bettercap-note-tree" className={`nav-children tree-children ${expandedNotes.bettercap ? "is-expanded" : ""}`}>
+              <button className={active("bettercap") ? "is-active" : ""} type="button" onClick={() => navigate({ kind: "bettercap" })}>
+                <span>00</span><span>START / INDEX</span>
+              </button>
               {data.bettercap.flows.map((flow) => (
                 <button className={active("flow", flow.id) ? "is-active" : ""} type="button" key={flow.id} onClick={() => navigate({ kind: "flow", id: flow.id })}>
                   <span>{flow.number}</span><span>{flow.title}</span>
                 </button>
               ))}
-              {data.bettercap.cleanups.map((cleanup) => (
+              {data.bettercap.cleanups.map((cleanup, index) => (
                 <button className={`cleanup-nav ${active("cleanup", cleanup.id) ? "is-active" : ""}`} type="button" key={cleanup.id} onClick={() => navigate({ kind: "cleanup", id: cleanup.id })}>
-                  <span>×</span><span>{cleanup.title}</span>
+                  <span>{String(data.bettercap.flows.length + index + 1).padStart(2, "0")}</span><span>{cleanup.title}</span>
                 </button>
               ))}
             </div>
@@ -800,7 +838,7 @@ function NotebookShell({ data }: { data: VaultData }) {
         </nav>
 
         <footer className="sidebar-footer">
-          <div><span className="status-pulse" aria-hidden="true" /><p><strong>VAULT OPEN</strong><small>plaintext tylko w pamięci</small></p></div>
+          <div><span className="status-pulse" aria-hidden="true" /><p><strong>BUFFER ONLINE</strong><small>plaintext tylko w pamięci</small></p></div>
           <span>v0.1</span>
         </footer>
       </aside>
@@ -810,8 +848,8 @@ function NotebookShell({ data }: { data: VaultData }) {
           {content}
         </div>
         <footer className="content-footer">
-          <span>NERDBOOK // PRIVATE KNOWLEDGE VAULT</span>
-          <span>LAB NOTES · RUNBOOKS · CHEAT SHEETS</span>
+          <span>NERDBOOK // EXTERNAL MEMORY BUFFER</span>
+          <span>FOR THINGS THAT WORKED ONCE</span>
         </footer>
       </main>
     </div>

@@ -16,9 +16,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://d3h420.github.io/Ne
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "NerdBook // Private Knowledge Vault",
+  title: "NerdBook // External Memory Buffer",
   description:
-    "Prywatny, szyfrowany notes techniczny: dokumentacja, runbooki i cheat sheety do pracy w LAB-ie.",
+    "Zapomniane komendy, podejrzane workflowy i rzeczy, które kiedyś zadziałały. Prawdopodobnie ważne.",
   applicationName: "NerdBook",
   authors: [{ name: "NerdBook" }],
   keywords: [
@@ -42,22 +42,22 @@ export const metadata: Metadata = {
     type: "website",
     url: siteUrl,
     siteName: "NerdBook",
-    title: "NerdBook // Private Knowledge Vault",
-    description: "Lab notes, runbooki i cheat sheety w prywatnym, szyfrowanym sejfie.",
+    title: "NerdBook // External Memory Buffer",
+    description: "Forgotten commands, questionable workflows and things that worked once. Probably important.",
     images: [
       {
-        url: "og.png",
+        url: "og-buffer.png",
         width: 1200,
         height: 630,
-        alt: "NerdBook — Private Knowledge Vault",
+        alt: "NerdBook — External Memory Buffer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NerdBook // Private Knowledge Vault",
-    description: "Lab notes, runbooki i cheat sheety w szyfrowanym sejfie.",
-    images: ["og.png"],
+    title: "NerdBook // External Memory Buffer",
+    description: "Forgotten commands, questionable workflows and things that worked once. Probably important.",
+    images: ["og-buffer.png"],
   },
   icons: {
     icon: "favicon.png",
