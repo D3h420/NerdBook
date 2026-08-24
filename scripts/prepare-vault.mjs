@@ -138,12 +138,14 @@ const parseGeneralNote = (html) => {
   if (current.blocks.length) chapters.push(current);
 
   const removedChapterIds = new Set([
+    "chapter-0",
     "chapter-5",
     "chapter-6",
     "chapter-7",
     "chapter-8",
   ]);
   const removedTocEntries = new Set([
+    "Fundamenty i środowisko LAB",
     "Łączenie narzędzi",
     "Pytanie → narzędzie",
     "Oficjalne źródła",

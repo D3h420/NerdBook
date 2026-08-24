@@ -296,7 +296,7 @@ function GeneralReader({
           </div>
         </header>
 
-        {chapter.id === "intro" || chapter.id === "chapter-0" ? (
+        {chapter.id === "intro" ? (
           <LabNotice>
             Skanuj i przechwytuj wyłącznie systemy oraz sieci, do których masz zgodę. Pliki PCAP i logi traktuj jak dane wrażliwe.
           </LabNotice>
@@ -504,7 +504,8 @@ function Dashboard({ data, navigate }: { data: VaultData; navigate: (view: Noteb
   const firstFlow = data.bettercap.flows[0];
   const firstChapter = data.general.chapters[0];
   const zeek = data.general.chapters.find((chapter) => chapter.id === "chapter-3");
-  const indexedItems = data.general.chapters.length + data.bettercap.flows.length + data.bettercap.cleanups.length;
+  const generalSections = data.general.chapters.filter((chapter) => chapter.id !== "intro");
+  const indexedItems = generalSections.length + data.bettercap.flows.length + data.bettercap.cleanups.length;
 
   return (
     <article className="dashboard">
@@ -542,7 +543,7 @@ function Dashboard({ data, navigate }: { data: VaultData; navigate: (view: Noteb
             <div className="note-card-top"><span>01 / HANDBOOK</span><span>v{data.general.version}</span></div>
             <h3>{data.general.title}</h3>
             <p>{data.general.kicker}</p>
-            <div className="note-card-stats"><span>{data.general.stats.words.toLocaleString("pl-PL")} słów</span><span>{data.general.chapters.length} rozdziałów</span></div>
+            <div className="note-card-stats"><span>{data.general.stats.words.toLocaleString("pl-PL")} słów</span><span>{generalSections.length} rozdziały</span></div>
             <span className="note-card-cta">Otwórz podręcznik <b>→</b></span>
           </button>
           <button className="note-card note-card-runbook" type="button" onClick={() => navigate({ kind: "bettercap" })}>
@@ -790,11 +791,11 @@ function NotebookShell({ data }: { data: VaultData }) {
               aria-controls="general-note-tree"
             >
               <span className="tree-chevron" aria-hidden="true">›</span>
-              <div><strong>{data.general.title}</strong><small>NOTE 01 · {data.general.chapters.length} sekcji</small></div>
+              <div><strong>{data.general.title}</strong><small>NOTE 01 · {data.general.chapters.filter((chapter) => chapter.id !== "intro").length} sekcje</small></div>
               <span className="tree-order" aria-hidden="true">01</span>
             </button>
             <div id="general-note-tree" className={`nav-children tree-children ${expandedNotes.general ? "is-expanded" : ""}`}>
-              {data.general.chapters.map((chapter) => (
+              {data.general.chapters.filter((chapter) => chapter.id !== "intro").map((chapter) => (
                 <button
                   className={active("general", chapter.id) ? "is-active" : ""}
                   type="button"
@@ -816,13 +817,10 @@ function NotebookShell({ data }: { data: VaultData }) {
               aria-controls="bettercap-note-tree"
             >
               <span className="tree-chevron" aria-hidden="true">›</span>
-              <div><strong>Bettercap</strong><small>NOTE 02 · {data.bettercap.flows.length + data.bettercap.cleanups.length + 1} sekcji</small></div>
+              <div><strong>Bettercap</strong><small>NOTE 02 · {data.bettercap.flows.length + data.bettercap.cleanups.length} sekcji</small></div>
               <span className="tree-order" aria-hidden="true">02</span>
             </button>
             <div id="bettercap-note-tree" className={`nav-children tree-children ${expandedNotes.bettercap ? "is-expanded" : ""}`}>
-              <button className={active("bettercap") ? "is-active" : ""} type="button" onClick={() => navigate({ kind: "bettercap" })}>
-                <span>00</span><span>START / INDEX</span>
-              </button>
               {data.bettercap.flows.map((flow) => (
                 <button className={active("flow", flow.id) ? "is-active" : ""} type="button" key={flow.id} onClick={() => navigate({ kind: "flow", id: flow.id })}>
                   <span>{flow.number}</span><span>{flow.title}</span>
