@@ -1,0 +1,32 @@
+{
+  "name": "nerdbook-private-notes",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:pages": "next build",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "notes:import": "node scripts/prepare-vault.mjs",
+    "vault:encrypt": "node scripts/vault.mjs encrypt",
+    "vault:decrypt": "node scripts/vault.mjs decrypt"
+  },
+  "dependencies": {
+    "next": "16.3.2",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.2",
+    "typescript": "5.9.3"
+  },
+  "type": "module"
+}
